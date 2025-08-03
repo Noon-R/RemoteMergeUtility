@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  
+  <!-- Product Definition -->
+  <Product Id="*" 
+           Name="RemoteMergeUtility" 
+           Language="1041" 
+           Version="1.0.0.0" 
+           Manufacturer="RemoteMergeUtility Development Team" 
+           UpgradeCode="12345678-1234-1234-1234-123456789012">
+    
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Description="RemoteMergeUtility - Project Key-Path Management Tool"
+             Comments="A WPF application for managing project configurations and URL scheme handling"
+             Manufacturer="RemoteMergeUtility Development Team" />
+
+    <!-- Major Upgrade -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    
+    <!-- Media -->
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- UI -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    
+    <!-- License Agreement -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="RemoteMergeUtility" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="RegistryComponent" />
+    </Feature>
+
+    <!-- Custom Actions for Registry Setup -->
+    <CustomAction Id="RegisterUrlScheme" 
+                  ExeCommand="&quot;[INSTALLFOLDER]Scripts\RegisterUrlScheme.bat&quot;"
+                  Directory="INSTALLFOLDER"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+    
+    <CustomAction Id="UnregisterUrlScheme" 
+                  ExeCommand="&quot;[INSTALLFOLDER]Scripts\UnregisterUrlScheme.bat&quot;"
+                  Directory="INSTALLFOLDER"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!-- Install Sequence -->
+    <InstallExecuteSequence>
+      <Custom Action="RegisterUrlScheme" After="InstallFiles">NOT Installed</Custom>
+      <Custom Action="UnregisterUrlScheme" After="InstallInitialize">REMOVE="ALL"</Custom>
+    </InstallExecuteSequence>
+
+  </Product>
+
+  <!-- Fragment for Directory Structure -->
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="RemoteMergeUtility" />
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="RemoteMergeUtility" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <!-- Fragment for Components -->
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      
+      <!-- Main Application Files -->
+      <Component Id="MainExecutable" Guid="*">
+        <File Id="RemoteMergeUtilityExe" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\RemoteMergeUtility.exe" 
+              KeyPath="yes" />
+      </Component>
+      
+      <!-- Dependencies -->
+      <Component Id="Dependencies" Guid="*">
+        <File Id="CommunityToolkitMvvmDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\CommunityToolkit.Mvvm.dll" />
+        <File Id="LivetDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.dll" />
+        <File Id="LivetBehaviorsDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.Behaviors.dll" />
+        <File Id="LivetCollectionsDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.Collections.dll" />
+        <File Id="LivetConvertersDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.Converters.dll" />
+        <File Id="LivetCoreDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.Core.dll" />
+        <File Id="LivetEventListenersDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.EventListeners.dll" />
+        <File Id="LivetMessagingDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.Messaging.dll" />
+        <File Id="LivetMvvmDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Livet.Mvvm.dll" />
+        <File Id="MaterialDesignColorsDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\MaterialDesignColors.dll" />
+        <File Id="MaterialDesignThemesWpfDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\MaterialDesignThemes.Wpf.dll" />
+        <File Id="MicrosoftExtensionsDependencyInjectionDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Microsoft.Extensions.DependencyInjection.dll" />
+        <File Id="MicrosoftExtensionsDependencyInjectionAbstractionsDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+        <File Id="MicrosoftXamlBehaviorsDll" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\Microsoft.Xaml.Behaviors.dll" />
+      </Component>
+
+      <!-- Configuration Files -->
+      <Component Id="ConfigFiles" Guid="*">
+        <File Id="RemoteMergeUtilityDepsJson" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\RemoteMergeUtility.deps.json" />
+        <File Id="RemoteMergeUtilityRuntimeConfigJson" 
+              Source="$(var.SolutionDir)RemoteMergeUtility\RemoteMergeUtility\bin\Release\net8.0-windows\RemoteMergeUtility.runtimeconfig.json" />
+      </Component>
+
+      <!-- Scripts Directory -->
+      <Component Id="ScriptsDirectory" Guid="*" Directory="INSTALLFOLDER">
+        <CreateFolder Directory="INSTALLFOLDER" />
+        <RemoveFolder Id="ScriptsFolder" Directory="INSTALLFOLDER" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\RemoteMergeUtility" Name="ScriptsInstalled" Type="string" Value="1" KeyPath="yes" />
+      </Component>
+
+      <!-- Scripts -->
+      <Component Id="Scripts" Guid="*">
+        <CreateFolder Directory="INSTALLFOLDER" />
+        <File Id="RegisterUrlSchemeBat" 
+              Source="$(var.SolutionDir)Scripts\RegisterUrlScheme.bat" 
+              Name="RegisterUrlScheme.bat" />
+        <File Id="UnregisterUrlSchemeBat" 
+              Source="$(var.SolutionDir)Scripts\UnregisterUrlScheme.bat" 
+              Name="UnregisterUrlScheme.bat" />
+        <File Id="TestUrlSchemeBat" 
+              Source="$(var.SolutionDir)Scripts\TestUrlScheme.bat" 
+              Name="TestUrlScheme.bat" />
+      </Component>
+
+      <!-- Start Menu Shortcut -->
+      <Component Id="ApplicationShortcut" Guid="*" Directory="ApplicationProgramsFolder">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="RemoteMergeUtility"
+                  Description="Project Key-Path Management Tool"
+                  Target="[INSTALLFOLDER]RemoteMergeUtility.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\RemoteMergeUtility" Name="StartMenuInstalled" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
+
+    <!-- Registry Component for URL Scheme -->
+    <Component Id="RegistryComponent" Guid="*" Directory="INSTALLFOLDER">
+      <!-- URL Scheme Registry Entries -->
+      <RegistryKey Root="HKCR" Key="RemoteMergeUtility">
+        <RegistryValue Type="string" Value="URL:RemoteMergeUtility Protocol" />
+        <RegistryValue Name="URL Protocol" Type="string" Value="" />
+      </RegistryKey>
+      
+      <RegistryKey Root="HKCR" Key="RemoteMergeUtility\DefaultIcon">
+        <RegistryValue Type="string" Value="&quot;[INSTALLFOLDER]RemoteMergeUtility.exe&quot;,1" />
+      </RegistryKey>
+      
+      <RegistryKey Root="HKCR" Key="RemoteMergeUtility\shell\open\command">
+        <RegistryValue Type="string" Value="&quot;[INSTALLFOLDER]RemoteMergeUtility.exe&quot; &quot;%1&quot;" />
+      </RegistryKey>
+      
+      <!-- URL Scheme Redirect -->
+      <RegistryKey Root="HKCR" Key="mergeutil">
+        <RegistryValue Type="string" Value="RemoteMergeUtility" />
+      </RegistryKey>
+      
+      <!-- Application Registry Information -->
+      <RegistryKey Root="HKLM" Key="SOFTWARE\RemoteMergeUtility">
+        <RegistryValue Name="InstallPath" Type="string" Value="[INSTALLFOLDER]" />
+        <RegistryValue Name="Version" Type="string" Value="1.0.0.0" />
+        <RegistryValue Name="DisplayName" Type="string" Value="RemoteMergeUtility" />
+      </RegistryKey>
+      
+      <RegistryValue Root="HKCR" Key="Software\RemoteMergeUtility" Name="RegistryInstalled" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+  </Fragment>
+  
+</Wix>
