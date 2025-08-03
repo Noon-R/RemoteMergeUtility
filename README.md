@@ -2,7 +2,7 @@
 
 A WPF desktop application for managing project keys and paths with custom URL scheme integration for shell command execution.
 
-## 🎯 Features
+## Features
 
 - **Project Management**: Manage key-to-path mappings for development projects
 - **Editable Grid Interface**: Real-time editing of project configurations via DataGrid
@@ -10,7 +10,7 @@ A WPF desktop application for managing project keys and paths with custom URL sc
 - **MVVM Architecture**: Clean separation of concerns with strict MVVM implementation
 - **Modern UI**: Material Design components for contemporary user experience
 
-## 🛠�E�ETechnology Stack
+## Technology Stack
 
 - **.NET 8.0** - Modern cross-platform framework
 - **WPF** - Rich desktop application framework
@@ -20,7 +20,7 @@ A WPF desktop application for managing project keys and paths with custom URL sc
 - **MaterialDesignThemes** - Material Design UI components
 - **Serilog** - Structured logging framework
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -55,7 +55,7 @@ dotnet build RemoteMergeUtility/RemoteMergeUtility.sln -c Release
 dotnet clean RemoteMergeUtility/RemoteMergeUtility.sln
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 RemoteMergeUtility/
@@ -71,7 +71,7 @@ RemoteMergeUtility/
 └── README.md					# This file
 ```
 
-## 🎮 Usage
+## Usage
 
 1. **Launch the application**
 2. **Add projects** using the "追加" (Add) button
@@ -81,14 +81,14 @@ RemoteMergeUtility/
 4. **Remove projects** by selecting a row and clicking "削除" (Delete)
 5. **Data persistence**: Projects are automatically saved on application exit
 
-## 🔧 Configuration
+## Configuration
 
 Project data is stored in:
 ```
 %AppData%/RemoteMergeUtility/projects.json
 ```
 
-## 🏗�E�EArchitecture
+## Architecture
 
 This application follows strict **MVVM (Model-View-ViewModel)** principles:
 
@@ -104,7 +104,7 @@ This application follows strict **MVVM (Model-View-ViewModel)** principles:
 - **Repository Pattern**: Service interfaces for data access abstraction
 - **Dependency Injection**: Service lifetime management
 
-## 🔮 Roadmap
+## Roadmap
 
 ### Next Milestones
 
@@ -122,7 +122,7 @@ This application follows strict **MVVM (Model-View-ViewModel)** principles:
 - [ ] Multi-language UI support
 - [ ] Themes and customization options
 
-## 🤁EContributing
+## Contributing
 
 This project follows Japanese coding standards as documented in `wpf_mvvm_coding_standards.md`. Key conventions:
 
@@ -132,11 +132,11 @@ This project follows Japanese coding standards as documented in `wpf_mvvm_coding
 - **Strict MVVM**: No business logic in Views
 - **Command binding**: No event handlers in code-behind
 
-## 📄 License
+## License
 
 This project is developed with Claude Code assistance and follows modern .NET development practices.
 
-## 📚 Documentation
+## Documentation
 
 For detailed development information, see:
 - [`Documents/DEVELOPMENT_STATUS.md`](Documents/DEVELOPMENT_STATUS.md) - Comprehensive development status
