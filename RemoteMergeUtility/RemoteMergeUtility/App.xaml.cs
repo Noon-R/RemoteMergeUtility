@@ -5,6 +5,10 @@ using System.Windows;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading;
+using System.IO;
+using System.IO.Pipes;
+using System.Text;
 using RemoteMergeUtility.Services;
 using RemoteMergeUtility.Models;
 
@@ -19,6 +23,11 @@ namespace RemoteMergeUtility
 		private readonly JsonProjectDataService _DATA_SERVICE = new JsonProjectDataService();
 		private readonly ILaunchToolService _LAUNCH_TOOL_SERVICE;
 		private IEnumerable<ProjectInfo> _LOADED_PROJECTS = new List<ProjectInfo>();
+		
+		private static Mutex _INSTANCE_MUTEX;
+		private const string MUTEX_NAME = "RemoteMergeUtility_SingleInstance";
+		private const string PIPE_NAME = "RemoteMergeUtility_UrlScheme";
+		private NamedPipeServerStream _PIPE_SERVER;
 
 		public App()
 		{
@@ -34,6 +43,24 @@ namespace RemoteMergeUtility
 
 		protected override async void OnStartup(StartupEventArgs e)
 		{
+			// 単一インスタンス制御
+			bool isNewInstance;
+			_INSTANCE_MUTEX = new Mutex(true, MUTEX_NAME, out isNewInstance);
+
+			if (!isNewInstance)
+			{
+				// 既存インスタンスが存在する場合
+				if (e.Args.Length > 0)
+				{
+					// URLスキーマの場合は既存インスタンスに処理を委譲
+					await SendToExistingInstance(e.Args);
+				}
+				
+				// 新しいインスタンスを終了
+				Shutdown();
+				return;
+			}
+
 			base.OnStartup(e);
 
 			// ProjectInfoを最初に読み込み
@@ -44,6 +71,9 @@ namespace RemoteMergeUtility
 			{
 				ProcessCommandLineArgs(e.Args);
 			}
+
+			// パイプサーバー開始
+			StartPipeServer();
 		}
 
 		private async Task LoadProjectsAsync()
@@ -174,10 +204,81 @@ namespace RemoteMergeUtility
 			// 必要に応じて実装
 		}
 
+		private async Task SendToExistingInstance(string[] args)
+		{
+			try
+			{
+				using var pipeClient = new NamedPipeClientStream(".", PIPE_NAME, PipeDirection.Out);
+				await pipeClient.ConnectAsync(5000); // 5秒タイムアウト
+
+				var message = string.Join("|", args);
+				var data = Encoding.UTF8.GetBytes(message);
+				await pipeClient.WriteAsync(data, 0, data.Length);
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine($"[APP] Failed to send to existing instance: {ex.Message}");
+			}
+		}
+
+		private void StartPipeServer()
+		{
+			Task.Run(async () =>
+			{
+				while (true)
+				{
+					try
+					{
+						_PIPE_SERVER = new NamedPipeServerStream(PIPE_NAME, PipeDirection.In);
+						await _PIPE_SERVER.WaitForConnectionAsync();
+
+						using var reader = new StreamReader(_PIPE_SERVER, Encoding.UTF8);
+						var message = await reader.ReadToEndAsync();
+						
+						if (!string.IsNullOrEmpty(message))
+						{
+							var args = message.Split('|');
+							
+							// UIスレッドで実行
+							Dispatcher.Invoke(() =>
+							{
+								ProcessCommandLineArgs(args);
+								
+								// メインウィンドウを前面に表示
+								if (MainWindow != null)
+								{
+									if (MainWindow.WindowState == WindowState.Minimized)
+									{
+										MainWindow.WindowState = WindowState.Normal;
+									}
+									MainWindow.Activate();
+									MainWindow.Topmost = true;
+									MainWindow.Topmost = false;
+								}
+							});
+						}
+
+						_PIPE_SERVER.Disconnect();
+					}
+					catch (Exception ex)
+					{
+						System.Diagnostics.Debug.WriteLine($"[APP] Pipe server error: {ex.Message}");
+					}
+					finally
+					{
+						_PIPE_SERVER?.Dispose();
+					}
+				}
+			});
+		}
+
 		protected override void OnExit(ExitEventArgs e)
 		{
 			// リソースの解放
 			_LAUNCH_TOOL_SERVICE?.Dispose();
+			_PIPE_SERVER?.Dispose();
+			_INSTANCE_MUTEX?.ReleaseMutex();
+			_INSTANCE_MUTEX?.Dispose();
 			base.OnExit(e);
 		}
 	}
