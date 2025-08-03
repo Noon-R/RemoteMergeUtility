@@ -9,12 +9,14 @@ namespace RemoteMergeUtility.ViewModels
 	{
 		private ProjectInfo? _SelectedProject;
 		private readonly ObservableCollection<ProjectInfo> _PROJECTS;
+		private readonly ICommand _AddProjectCommand;
+		private readonly ICommand _RemoveProjectCommand;
 
 		public ProjectManagerViewModel()
 		{
 			_PROJECTS = new ObservableCollection<ProjectInfo>();
-			AddProjectCommand = new RelayCommand(ExecuteAddProject);
-			RemoveProjectCommand = new RelayCommand(ExecuteRemoveProject, CanExecuteRemoveProject);
+			_AddProjectCommand = new RelayCommand(ExecuteAddProject);
+			_RemoveProjectCommand = new RelayCommand(ExecuteRemoveProject, CanExecuteRemoveProject);
 			
 			// 初期状態でDefaultプロジェクトを確保
 			EnsureDefaultProject();
@@ -28,8 +30,8 @@ namespace RemoteMergeUtility.ViewModels
 			set => SetProperty(ref _SelectedProject, value);
 		}
 
-		public ICommand AddProjectCommand { get; }
-		public ICommand RemoveProjectCommand { get; }
+		public ICommand AddProjectCommand => _AddProjectCommand;
+		public ICommand RemoveProjectCommand => _RemoveProjectCommand;
 
 		private void ExecuteAddProject()
 		{
