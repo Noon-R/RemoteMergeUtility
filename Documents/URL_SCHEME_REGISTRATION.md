@@ -28,19 +28,22 @@ Create a `.reg` file with the following content and execute it as Administrator:
 ```registry
 Windows Registry Editor Version 5.00
 
-[HKEY_CLASSES_ROOT\mergeutil]
-@="URL:Remote Merge Utility Protocol"
+[HKEY_CLASSES_ROOT\RemoteMergeUtility]
+@="URL:RemoteMergeUtility Protocol"
 "URL Protocol"=""
 
-[HKEY_CLASSES_ROOT\mergeutil\DefaultIcon]
+[HKEY_CLASSES_ROOT\RemoteMergeUtility\DefaultIcon]
 @="\"C:\\Path\\To\\RemoteMergeUtility.exe\",1"
 
-[HKEY_CLASSES_ROOT\mergeutil\shell]
+[HKEY_CLASSES_ROOT\RemoteMergeUtility\shell]
 
-[HKEY_CLASSES_ROOT\mergeutil\shell\open]
+[HKEY_CLASSES_ROOT\RemoteMergeUtility\shell\open]
 
-[HKEY_CLASSES_ROOT\mergeutil\shell\open\command]
+[HKEY_CLASSES_ROOT\RemoteMergeUtility\shell\open\command]
 @="\"C:\\Path\\To\\RemoteMergeUtility.exe\" \"%1\""
+
+[HKEY_CLASSES_ROOT\mergeutil]
+@="RemoteMergeUtility"
 ```
 
 **Important**: Replace `C:\\Path\\To\\RemoteMergeUtility.exe` with the actual installation path of your application.
@@ -52,15 +55,19 @@ $exePath = "C:\Path\To\RemoteMergeUtility.exe"
 $protocolName = "mergeutil"
 
 # Create registry keys
+New-Item -Path "HKCR:\RemoteMergeUtility" -Force
+Set-ItemProperty -Path "HKCR:\RemoteMergeUtility" -Name "(Default)" -Value "URL:RemoteMergeUtility Protocol"
+Set-ItemProperty -Path "HKCR:\RemoteMergeUtility" -Name "URL Protocol" -Value ""
+
+New-Item -Path "HKCR:\RemoteMergeUtility\DefaultIcon" -Force
+Set-ItemProperty -Path "HKCR:\RemoteMergeUtility\DefaultIcon" -Name "(Default)" -Value "`"$exePath`",1"
+
+New-Item -Path "HKCR:\RemoteMergeUtility\shell\open\command" -Force
+Set-ItemProperty -Path "HKCR:\RemoteMergeUtility\shell\open\command" -Name "(Default)" -Value "`"$exePath`" `"%1`""
+
+# Create redirect for mergeutil:// scheme
 New-Item -Path "HKCR:\$protocolName" -Force
-Set-ItemProperty -Path "HKCR:\$protocolName" -Name "(Default)" -Value "URL:Remote Merge Utility Protocol"
-Set-ItemProperty -Path "HKCR:\$protocolName" -Name "URL Protocol" -Value ""
-
-New-Item -Path "HKCR:\$protocolName\DefaultIcon" -Force
-Set-ItemProperty -Path "HKCR:\$protocolName\DefaultIcon" -Name "(Default)" -Value "`"$exePath`",1"
-
-New-Item -Path "HKCR:\$protocolName\shell\open\command" -Force
-Set-ItemProperty -Path "HKCR:\$protocolName\shell\open\command" -Name "(Default)" -Value "`"$exePath`" `"%1`""
+Set-ItemProperty -Path "HKCR:\$protocolName" -Name "(Default)" -Value "RemoteMergeUtility"
 
 Write-Host "URL scheme registered successfully!"
 ```
@@ -96,7 +103,7 @@ When a `mergeutil://` URL is clicked:
 ### Registration Issues
 - Ensure you run the registration script as Administrator
 - Verify the executable path is correct and accessible
-- Check that the registry entries were created under `HKEY_CLASSES_ROOT\mergeutil`
+- Check that the registry entries were created under `HKEY_CLASSES_ROOT\RemoteMergeUtility` and `HKEY_CLASSES_ROOT\mergeutil`
 
 ### URL Not Working
 - Test with a simple URL first: `mergeutil://?target=Default&revision=1`

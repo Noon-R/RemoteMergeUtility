@@ -8,8 +8,12 @@ echo ======================================
 echo.
 
 REM URLスキーマ登録確認
+reg query "HKEY_CLASSES_ROOT\RemoteMergeUtility" >nul 2>&1
+set "MAIN_EXISTS=%errorLevel%"
 reg query "HKEY_CLASSES_ROOT\mergeutil" >nul 2>&1
-if %errorLevel% neq 0 (
+set "REDIRECT_EXISTS=%errorLevel%"
+
+if %MAIN_EXISTS% neq 0 if %REDIRECT_EXISTS% neq 0 (
     echo ⚠️  警告: 'mergeutil://' URLスキーマが登録されていません。
     echo 先に RegisterUrlScheme.bat を管理者権限で実行してください。
     echo.

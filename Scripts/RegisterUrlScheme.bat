@@ -37,7 +37,7 @@ echo.
 REM レジストリ登録
 echo URLスキーマ 'mergeutil://' を登録中...
 
-reg add "HKEY_CLASSES_ROOT\mergeutil" /ve /d "URL:Remote Merge Utility Protocol" /f >nul
+reg add "HKEY_CLASSES_ROOT\mergeutil" /ve /d "URL:RemoteMergeUtility Protocol" /f >nul
 if %errorLevel% neq 0 (
     echo エラー: レジストリの書き込みに失敗しました。
     pause
