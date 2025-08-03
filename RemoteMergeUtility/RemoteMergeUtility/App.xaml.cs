@@ -1,16 +1,11 @@
-using System;
-using System.Configuration;
 using System.Data;
 using System.Windows;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Threading;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
 using RemoteMergeUtility.Services;
 using RemoteMergeUtility.Models;
+using Application = System.Windows.Application;
 
 namespace RemoteMergeUtility
 {
@@ -28,6 +23,7 @@ namespace RemoteMergeUtility
 		private const string MUTEX_NAME = "RemoteMergeUtility_SingleInstance";
 		private const string PIPE_NAME = "RemoteMergeUtility_UrlScheme";
 		private NamedPipeServerStream _PIPE_SERVER;
+		private NotifyIcon _NOTIFY_ICON;
 
 		public App()
 		{
@@ -74,6 +70,9 @@ namespace RemoteMergeUtility
 
 			// パイプサーバー開始
 			StartPipeServer();
+
+			// タスクトレイ初期化
+			InitializeSystemTray();
 		}
 
 		private async Task LoadProjectsAsync()
@@ -115,8 +114,8 @@ namespace RemoteMergeUtility
 			
 			if (targetProject == null)
 			{
-				MessageBox.Show($"エラー: プロジェクト '{request.Target}' が見つかりません。\n\n利用可能なプロジェクト:\n{string.Join("\n", _LOADED_PROJECTS.Select(p => $"- {p.Key}"))}", 
-					"URL Schema Handler - エラー", MessageBoxButton.OK, MessageBoxImage.Warning);
+				System.Windows.MessageBox.Show($"エラー: プロジェクト '{request.Target}' が見つかりません。\n\n利用可能なプロジェクト:\n{string.Join("\n", _LOADED_PROJECTS.Select(p => $"- {p.Key}"))}", 
+					"URL Schema Handler - エラー", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
 				return;
 			}
 
@@ -128,8 +127,8 @@ namespace RemoteMergeUtility
 				
 				if (string.IsNullOrEmpty(projectName))
 				{
-					MessageBox.Show($"エラー: プロジェクトパス '{targetProject.Path}' に対応するプロジェクト名が見つかりません。", 
-						"URL Schema Handler - エラー", MessageBoxButton.OK, MessageBoxImage.Warning);
+					System.Windows.MessageBox.Show($"エラー: プロジェクトパス '{targetProject.Path}' に対応するプロジェクト名が見つかりません。", 
+						"URL Schema Handler - エラー", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
 					return;
 				}
 
@@ -143,13 +142,13 @@ namespace RemoteMergeUtility
 					
 					if (!launchResult)
 					{
-						MessageBox.Show($"エラー: プロジェクト '{projectName}' の起動に失敗しました。", 
-							"URL Schema Handler - エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+						System.Windows.MessageBox.Show($"エラー: プロジェクト '{projectName}' の起動に失敗しました。", 
+							"URL Schema Handler - エラー", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 						return;
 					}
 
-					MessageBox.Show($"プロジェクト '{projectName}' を起動しました。\nRevision: {request.Revision}\nArgs: {request.Args}", 
-						"URL Schema Handler - 起動完了", MessageBoxButton.OK, MessageBoxImage.Information);
+					System.Windows.MessageBox.Show($"プロジェクト '{projectName}' を起動しました。\nRevision: {request.Revision}\nArgs: {request.Args}", 
+						"URL Schema Handler - 起動完了", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
 				}
 				else
 				{
@@ -158,19 +157,19 @@ namespace RemoteMergeUtility
 					
 					if (!httpResult)
 					{
-						MessageBox.Show($"エラー: プロジェクト '{projectName}' へのHTTPリクエスト送信に失敗しました。", 
-							"URL Schema Handler - エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+						System.Windows.MessageBox.Show($"エラー: プロジェクト '{projectName}' へのHTTPリクエスト送信に失敗しました。", 
+							"URL Schema Handler - エラー", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 						return;
 					}
 
-					MessageBox.Show($"プロジェクト '{projectName}' にHTTPリクエストを送信しました。\nRevision: {request.Revision}\nArgs: {request.Args}", 
-						"URL Schema Handler - 送信完了", MessageBoxButton.OK, MessageBoxImage.Information);
+					System.Windows.MessageBox.Show($"プロジェクト '{projectName}' にHTTPリクエストを送信しました。\nRevision: {request.Revision}\nArgs: {request.Args}", 
+						"URL Schema Handler - 送信完了", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
 				}
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"処理中にエラーが発生しました:\n{ex.Message}", 
-					"URL Schema Handler - エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+				System.Windows.MessageBox.Show($"処理中にエラーが発生しました:\n{ex.Message}", 
+					"URL Schema Handler - エラー", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
 			}
 		}
 
@@ -244,17 +243,8 @@ namespace RemoteMergeUtility
 							{
 								ProcessCommandLineArgs(args);
 								
-								// メインウィンドウを前面に表示
-								if (MainWindow != null)
-								{
-									if (MainWindow.WindowState == WindowState.Minimized)
-									{
-										MainWindow.WindowState = WindowState.Normal;
-									}
-									MainWindow.Activate();
-									MainWindow.Topmost = true;
-									MainWindow.Topmost = false;
-								}
+								// URLスキーマ処理時はウィンドウを表示しない（タスクトレイのまま）
+								// 必要に応じてノティフィケーションを表示
 							});
 						}
 
@@ -272,11 +262,61 @@ namespace RemoteMergeUtility
 			});
 		}
 
+		private void InitializeSystemTray()
+		{
+			_NOTIFY_ICON = new NotifyIcon
+			{
+				Icon = System.Drawing.SystemIcons.Application,
+				Visible = true,
+				Text = "RemoteMergeUtility"
+			};
+
+			// 右クリックメニューの作成
+			var contextMenu = new ContextMenuStrip();
+			
+			var editMenuItem = new ToolStripMenuItem("プロジェクト編集(&E)");
+			editMenuItem.Click += (sender, e) =>
+			{
+				Dispatcher.Invoke(() =>
+				{
+					var mainWindow = MainWindow as MainWindow;
+					mainWindow?.ShowEditWindow();
+				});
+			};
+
+			var exitMenuItem = new ToolStripMenuItem("終了(&X)");
+			exitMenuItem.Click += (sender, e) =>
+			{
+				Dispatcher.Invoke(() =>
+				{
+					_NOTIFY_ICON.Visible = false;
+					Shutdown();
+				});
+			};
+
+			contextMenu.Items.Add(editMenuItem);
+			contextMenu.Items.Add(new ToolStripSeparator());
+			contextMenu.Items.Add(exitMenuItem);
+			
+			_NOTIFY_ICON.ContextMenuStrip = contextMenu;
+
+			// ダブルクリックで編集画面を表示
+			_NOTIFY_ICON.DoubleClick += (sender, e) =>
+			{
+				Dispatcher.Invoke(() =>
+				{
+					var mainWindow = MainWindow as MainWindow;
+					mainWindow?.ShowEditWindow();
+				});
+			};
+		}
+
 		protected override void OnExit(ExitEventArgs e)
 		{
 			// リソースの解放
 			_LAUNCH_TOOL_SERVICE?.Dispose();
 			_PIPE_SERVER?.Dispose();
+			_NOTIFY_ICON?.Dispose();
 			_INSTANCE_MUTEX?.ReleaseMutex();
 			_INSTANCE_MUTEX?.Dispose();
 			base.OnExit(e);

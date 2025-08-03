@@ -16,21 +16,37 @@ namespace RemoteMergeUtility
 			var dataService = new JsonProjectDataService();
 			var viewModel = new ProjectManagerViewModel();
 			
-			// ƒf[ƒ^ƒRƒ“ƒeƒLƒXƒg‚ðÝ’è
+			// ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã®è¨­å®š
 			DataContext = viewModel;
 			
-			// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹Žž‚Ìƒf[ƒ^•Û‘¶
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’æœ€åˆã¯éžè¡¨ç¤ºã«ã™ã‚‹
+			WindowState = WindowState.Minimized;
+			ShowInTaskbar = false;
+			Visibility = Visibility.Hidden;
+			
+			// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¯ãƒ­ãƒ¼ã‚ºæ™‚ã¯ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã«éš ã™
 			Closing += async (sender, e) =>
 			{
+				e.Cancel = true; // å®Ÿéš›ã®ã‚¯ãƒ­ãƒ¼ã‚ºã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«
+				Hide();
 				await dataService.SaveProjectsAsync(viewModel.Projects);
 			};
 			
-			// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ŠJŽnŽž‚Ìƒf[ƒ^“Ç‚Ýž‚Ý
+			// ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³é–‹å§‹æ™‚ã®ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿
 			Loaded += async (sender, e) =>
 			{
 				var projects = await dataService.LoadProjectsAsync();
 				viewModel.LoadProjects(projects);
 			};
+		}
+
+		public void ShowEditWindow()
+		{
+			Show();
+			WindowState = WindowState.Normal;
+			Activate();
+			Topmost = true;
+			Topmost = false;
 		}
 	}
 }
