@@ -30,10 +30,10 @@ namespace RemoteMergeUtility
 			// ビルド構成に応じてサービスを切り替え
 #if DEBUG
 			_LAUNCH_TOOL_SERVICE = new MockLaunchToolService();
-			System.Diagnostics.Debug.WriteLine("[APP] Using MockLaunchToolService (DEBUG build)");
+			LogService.Information("Using MockLaunchToolService (DEBUG build)");
 #else
 			_LAUNCH_TOOL_SERVICE = new LaunchToolService();
-			System.Diagnostics.Debug.WriteLine("[APP] Using LaunchToolService (RELEASE build)");
+			LogService.Information("Using LaunchToolService (RELEASE build)");
 #endif
 		}
 
@@ -216,7 +216,7 @@ namespace RemoteMergeUtility
 			}
 			catch (Exception ex)
 			{
-				System.Diagnostics.Debug.WriteLine($"[APP] Failed to send to existing instance: {ex.Message}");
+				LogService.Error("Failed to send to existing instance", ex);
 			}
 		}
 
@@ -252,7 +252,7 @@ namespace RemoteMergeUtility
 					}
 					catch (Exception ex)
 					{
-						System.Diagnostics.Debug.WriteLine($"[APP] Pipe server error: {ex.Message}");
+						LogService.Error("Pipe server error", ex);
 					}
 					finally
 					{

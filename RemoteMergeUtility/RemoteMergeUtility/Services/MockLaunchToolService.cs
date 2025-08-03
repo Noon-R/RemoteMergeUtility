@@ -30,8 +30,8 @@ namespace RemoteMergeUtility.Services
 			// モック：事前定義された起動状態を返す
 			var isRunning = _RUNNING_PROJECTS.Contains(projectName);
 			
-			// デバッグ情報をコンソールに出力
-			System.Diagnostics.Debug.WriteLine($"[MOCK] IsProjectRunning('{projectName}') = {isRunning}");
+			// デバッグ情報をログに出力
+			LogService.Debug($"[MOCK] IsProjectRunning('{projectName}') = {isRunning}");
 			
 			return Task.FromResult(isRunning);
 		}
@@ -41,8 +41,8 @@ namespace RemoteMergeUtility.Services
 			// モック：常に成功とし、起動済みリストに追加
 			_RUNNING_PROJECTS.Add(projectName);
 			
-			// デバッグ情報をコンソールに出力
-			System.Diagnostics.Debug.WriteLine($"[MOCK] LaunchProject('{projectName}') = Success");
+			// デバッグ情報をログに出力
+			LogService.Debug($"[MOCK] LaunchProject('{projectName}') = Success");
 			
 			// 遅延をシミュレート
 			return Task.Delay(500).ContinueWith(_ => true);
@@ -52,8 +52,8 @@ namespace RemoteMergeUtility.Services
 		{
 			// モック：常に成功として扱う
 			
-			// デバッグ情報をコンソールに出力
-			System.Diagnostics.Debug.WriteLine($"[MOCK] SendHttpRequest('{projectName}', revision={revision}, args='{args}') = Success");
+			// デバッグ情報をログに出力
+			LogService.Debug($"[MOCK] SendHttpRequest('{projectName}', revision={revision}, args='{args}') = Success");
 			
 			// 遅延をシミュレート
 			return Task.Delay(300).ContinueWith(_ => true);
@@ -62,7 +62,7 @@ namespace RemoteMergeUtility.Services
 		public void Dispose()
 		{
 			// モック：何もしない
-			System.Diagnostics.Debug.WriteLine("[MOCK] MockLaunchToolService disposed");
+			LogService.Debug("[MOCK] MockLaunchToolService disposed");
 		}
 	}
 }
