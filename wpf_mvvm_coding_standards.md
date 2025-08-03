@@ -1,133 +1,121 @@
-# WPF MVVM コーディング規約
-
-## 🎯 基本方針
-- **MVVMパターンの厳格な遵守**
-- **保守性とテスタビリティの向上**
-- **個人開発での効率性を重視**
+# WPF MVVM コーチE��ング規紁E
+## 🎯 基本方釁E- **MVVMパターンの厳格な遵宁E*
+- **保守性とチE��タビリチE��の向丁E*
+- **個人開発での効玁E��を重要E*
 
 ---
 
-## 📁 プロジェクト構成
+## 📁 プロジェクト構�E
 
 ### フォルダ構造
 ```
 RemoteMer/
-├── Models/           # データモデル・ビジネスロジック
-├── ViewModels/       # ビューモデル
-├── Views/           # XAML画面
-├── Services/        # 外部サービス・データアクセス
-├── Converters/      # 値コンバーター
-├── Commands/        # カスタムコマンド
-├── Helpers/         # ヘルパークラス
-└── Resources/       # リソース（画像・辞書等）
-```
+├── Models/		   # チE�EタモチE��・ビジネスロジチE��
+├── ViewModels/	   # ビューモチE��
+├── Views/		   # XAML画面
+├── Services/		# 外部サービス・チE�Eタアクセス
+├── Converters/	  # 値コンバ�Eター
+├── Commands/		# カスタムコマンチE├── Helpers/		 # ヘルパ�Eクラス
+└── Resources/	   # リソース�E�画像�E辞書等！E```
 
-### ✅ チェックポイント
-- [ ] 各レイヤーが適切なフォルダに配置されている
-- [ ] Viewに直接ビジネスロジックが書かれていない
-- [ ] ViewModelがViewに依存していない
-
+### ✁EチェチE��ポインチE- [ ] 吁E��イヤーが適刁E��フォルダに配置されてぁE��
+- [ ] Viewに直接ビジネスロジチE��が書かれてぁE��ぁE- [ ] ViewModelがViewに依存してぁE��ぁE
 ---
 
-## 🏗️ MVVM実装規約
-
+## 🏗�E�EMVVM実裁E��紁E
 ### Model
 ```csharp
-// ✅ Good
+// ✁EGood
 public class User : INotifyPropertyChanged
 {
-    private string _Name;
-    public string Name
-    {
-        get => _Name;
-        set
-        {
-            _Name = value;
-            OnPropertyChanged();
-        }
-    }
+	private string _Name;
+	public string Name
+	{
+		get => _Name;
+		set
+		{
+			_Name = value;
+			OnPropertyChanged();
+		}
+	}
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+	public event PropertyChangedEventHandler PropertyChanged;
+	
+	protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
 }
 ```
 
 ### ViewModel
 ```csharp
-// ✅ Good
+// ✁EGood
 public class UserViewModel : ViewModelBase
 {
-    private User _User;
-    private ICommand _SaveCommand;
+	private User _User;
+	private ICommand _SaveCommand;
 
-    public User User
-    {
-        get => _User;
-        set => SetProperty(ref _User, value);
-    }
+	public User User
+	{
+		get => _User;
+		set => SetProperty(ref _User, value);
+	}
 
-    public ICommand SaveCommand => 
-        _SaveCommand ??= new RelayCommand(ExecuteSave, CanExecuteSave);
+	public ICommand SaveCommand => 
+		_SaveCommand ??= new RelayCommand(ExecuteSave, CanExecuteSave);
 
-    private void ExecuteSave()
-    {
-        // 保存処理
-    }
+	private void ExecuteSave()
+	{
+		// 保存�E琁E	}
 
-    private bool CanExecuteSave()
-    {
-        return User?.Name?.Length > 0;
-    }
+	private bool CanExecuteSave()
+	{
+		return User?.Name?.Length > 0;
+	}
 }
 ```
 
 ### View (XAML)
 ```xml
-<!-- ✅ Good -->
+<!-- ✁EGood -->
 <TextBox Text="{Binding User.Name, UpdateSourceTrigger=PropertyChanged}" />
-<Button Content="保存" Command="{Binding SaveCommand}" />
+<Button Content="保孁E Command="{Binding SaveCommand}" />
 
-<!-- ❌ Bad: コードビハインドでのイベント処理 -->
-<Button Content="保存" Click="SaveButton_Click" />
+<!-- ❁EBad: コードビハインドでのイベント�E琁E-->
+<Button Content="保孁E Click="SaveButton_Click" />
 ```
 
 ---
 
-## 📝 命名規約
-
-### クラス・プロパティ・メソッド
+## 📝 命名規紁E
+### クラス・プロパティ・メソチE��
 - **PascalCase**を使用
-- 意味のある名前を付ける
-- ViewModelには`ViewModel`サフィックス
-- Viewには画面の目的を表す名前
-
+- 意味のある名前を付けめE- ViewModelには`ViewModel`サフィチE��ス
+- Viewには画面の目皁E��表す名剁E
 ```csharp
-// ✅ Good
+// ✁EGood
 public class UserRegistrationViewModel { }
 public class UserRegistrationView { }
 public string FirstName { get; set; }
 public void SaveUserData() { }
 
-// ❌ Bad
+// ❁EBad
 public class UserVM { }
 public string fName { get; set; }
 public void Save() { }
 ```
 
-### フィールド・変数
+### フィールド�E変数
 - **UpperCamelCase**を使用
-- プライベートフィールドは`_`プレフィックス
+- プライベ�Eトフィールド�E`_`プレフィチE��ス
 
 ```csharp
-// ✅ Good
+// ✁EGood
 private string _UserName;
 private readonly IUserService _UserService;
 
-// ❌ Bad
+// ❁EBad
 private string UserName;
 private string _userName;
 private string username;
@@ -135,88 +123,84 @@ private string username;
 
 ---
 
-## 🔗 データバインディング
+## 🔗 チE�EタバインチE��ング
 
 ### 推奨パターン
 ```xml
-<!-- ✅ Good: 双方向バインディング -->
+<!-- ✁EGood: 双方向バインチE��ング -->
 <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
 
-<!-- ✅ Good: コマンドバインディング -->
+<!-- ✁EGood: コマンドバインチE��ング -->
 <Button Command="{Binding SaveCommand}" />
 
-<!-- ✅ Good: コンバーター使用 -->
+<!-- ✁EGood: コンバ�Eター使用 -->
 <TextBlock Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
 ```
 
-### ✅ チェックポイント
-- [ ] すべてのUI要素がViewModelにバインドされている
-- [ ] UpdateSourceTriggerが適切に設定されている
-- [ ] 型変換にはコンバーターを使用している
+### ✁EチェチE��ポインチE- [ ] すべてのUI要素がViewModelにバインドされてぁE��
+- [ ] UpdateSourceTriggerが適刁E��設定されてぁE��
+- [ ] 型変換にはコンバ�Eターを使用してぁE��
 
 ---
 
-## 🎨 XAML規約
-
-### レイアウト
-```xml
-<!-- ✅ Good: 構造化されたレイアウト -->
+## 🎨 XAML規紁E
+### レイアウチE```xml
+<!-- ✁EGood: 構造化されたレイアウチE-->
 <Grid>
-    <Grid.RowDefinitions>
-        <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
-        <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
-    
-    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-        <TextBlock Text="ユーザー名:" VerticalAlignment="Center"/>
-        <TextBox Text="{Binding UserName}" Width="200" Margin="5,0"/>
-    </StackPanel>
+	<Grid.RowDefinitions>
+		<RowDefinition Height="Auto"/>
+		<RowDefinition Height="*"/>
+		<RowDefinition Height="Auto"/>
+	</Grid.RowDefinitions>
+	
+	<StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+		<TextBlock Text="ユーザー吁E" VerticalAlignment="Center"/>
+		<TextBox Text="{Binding UserName}" Width="200" Margin="5,0"/>
+	</StackPanel>
 </Grid>
 ```
 
 ### スタイル・リソース
 ```xml
-<!-- ✅ Good: リソース辞書の活用 -->
+<!-- ✁EGood: リソース辞書の活用 -->
 <Window.Resources>
-    <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="#007ACC"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Padding" Value="10,5"/>
-    </Style>
+	<Style x:Key="PrimaryButtonStyle" TargetType="Button">
+		<Setter Property="Background" Value="#007ACC"/>
+		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Padding" Value="10,5"/>
+	</Style>
 </Window.Resources>
 ```
 
 ---
 
-## 🛠️ 依存性注入・サービス
+## 🛠�E�E依存性注入・サービス
 
 ### サービスインターフェース
 ```csharp
-// ✅ Good
+// ✁EGood
 public interface IUserService
 {
-    Task<User> GetUserAsync(int id);
-    Task SaveUserAsync(User user);
+	Task<User> GetUserAsync(int id);
+	Task SaveUserAsync(User user);
 }
 
 public class UserService : IUserService
 {
-    // 実装
-}
+	// 実裁E}
 ```
 
 ### ViewModelでの使用
 ```csharp
-// ✅ Good
+// ✁EGood
 public class UserViewModel : ViewModelBase
 {
-    private readonly IUserService _UserService;
+	private readonly IUserService _UserService;
 
-    public UserViewModel(IUserService userService)
-    {
-        _UserService = userService ?? throw new ArgumentNullException(nameof(userService));
-    }
+	public UserViewModel(IUserService userService)
+	{
+		_UserService = userService ?? throw new ArgumentNullException(nameof(userService));
+	}
 }
 ```
 
@@ -224,102 +208,89 @@ public class UserViewModel : ViewModelBase
 
 ## 🚨 エラーハンドリング
 
-### 非同期処理
-```csharp
-// ✅ Good
+### 非同期�E琁E```csharp
+// ✁EGood
 private async void ExecuteLoadUser()
 {
-    try
-    {
-        IsLoading = true;
-        User = await _UserService.GetUserAsync(UserId);
-    }
-    catch (Exception ex)
-    {
-        ErrorMessage = $"ユーザー読み込みエラー: {ex.Message}";
-        // ログ出力
-    }
-    finally
-    {
-        IsLoading = false;
-    }
+	try
+	{
+		IsLoading = true;
+		User = await _UserService.GetUserAsync(UserId);
+	}
+	catch (Exception ex)
+	{
+		ErrorMessage = $"ユーザー読み込みエラー: {ex.Message}";
+		// ログ出劁E	}
+	finally
+	{
+		IsLoading = false;
+	}
 }
 ```
 
-### バリデーション
+### バリチE�Eション
 ```csharp
-// ✅ Good: IDataErrorInfoの実装
-public class User : INotifyPropertyChanged, IDataErrorInfo
+// ✁EGood: IDataErrorInfoの実裁Epublic class User : INotifyPropertyChanged, IDataErrorInfo
 {
-    public string this[string columnName]
-    {
-        get
-        {
-            switch (columnName)
-            {
-                case nameof(Name):
-                    return string.IsNullOrEmpty(Name) ? "名前は必須です" : null;
-                default:
-                    return null;
-            }
-        }
-    }
+	public string this[string columnName]
+	{
+		get
+		{
+			switch (columnName)
+			{
+				case nameof(Name):
+					return string.IsNullOrEmpty(Name) ? "名前は忁E��でぁE : null;
+				default:
+					return null;
+			}
+		}
+	}
 
-    public string Error => null;
+	public string Error => null;
 }
 ```
 
 ---
 
-## 📋 コードレビューチェックリスト
-
-### MVVM遵守
-- [ ] Viewにビジネスロジックがない
-- [ ] ViewModelがViewに依存していない
-- [ ] ModelにUI関連のコードがない
-
+## 📋 コードレビューチェチE��リスチE
+### MVVM遵宁E- [ ] ViewにビジネスロジチE��がなぁE- [ ] ViewModelがViewに依存してぁE��ぁE- [ ] ModelにUI関連のコードがなぁE
 ### パフォーマンス
-- [ ] 重い処理は非同期で実装
-- [ ] メモリリークの原因となるイベントハンドラーが適切に解除されている
-- [ ] 不要なPropertyChangedイベントが発生していない
-
+- [ ] 重い処琁E�E非同期で実裁E- [ ] メモリリークの原因となるイベントハンドラーが適刁E��解除されてぁE��
+- [ ] 不要なPropertyChangedイベントが発生してぁE��ぁE
 ### 保守性
 - [ ] クラスの責任が単一である
-- [ ] メソッドが適切な長さ（20行以内推奨）
-- [ ] マジックナンバーが定数化されている
+- [ ] メソチE��が適刁E��長さ！E0行以冁E��奨�E�E- [ ] マジチE��ナンバ�Eが定数化されてぁE��
 
-### テスタビリティ
+### チE��タビリチE��
 - [ ] ViewModelが単体テスト可能
-- [ ] 依存関係がインターフェースで抽象化されている
-- [ ] コマンドの実行条件が明確
+- [ ] 依存関係がインターフェースで抽象化されてぁE��
+- [ ] コマンド�E実行条件が�E確
 
 ---
 
-## 🔧 推奨ツール・ライブラリ
+## 🔧 推奨チE�Eル・ライブラリ
 
-### 必須
-- **CommunityToolkit.Mvvm** (旧Microsoft.Toolkit.Mvvm)
-- **System.ComponentModel.DataAnnotations** (バリデーション)
+### 忁E��E- **CommunityToolkit.Mvvm** (旧Microsoft.Toolkit.Mvvm)
+- **System.ComponentModel.DataAnnotations** (バリチE�Eション)
 
 ### 推奨
-- **Prism** (大規模アプリケーションの場合)
+- **Prism** (大規模アプリケーションの場吁E
 - **MaterialDesignInXamlToolkit** (モダンUI)
-- **Serilog** (ログ出力)
+- **Serilog** (ログ出劁E
 
-### 設定例
-```xml
+### 設定侁E```xml
 <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
 <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
 ```
 
 ---
 
-## 📚 参考リンク
+## 📚 参老E��ンク
 
 - [Microsoft WPF ガイドライン](https://docs.microsoft.com/ja-jp/dotnet/desktop/wpf/)
 - [MVVM パターン詳細](https://docs.microsoft.com/ja-jp/archive/msdn-magazine/2009/february/patterns-wpf-apps-with-the-model-view-viewmodel-design-pattern)
-- [CommunityToolkit.Mvvm ドキュメント](https://docs.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
+- [CommunityToolkit.Mvvm ドキュメンチE(https://docs.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
 
 ---
 
-*最終更新: 2025年8月*
+*最終更新: 2025年8朁E

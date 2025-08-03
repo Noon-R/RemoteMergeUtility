@@ -1,39 +1,36 @@
-ï»¿using System.Windows;
+using System.Windows;
 using RemoteMergeUtility.ViewModels;
 using RemoteMergeUtility.Services;
 
 namespace RemoteMergeUtility
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
-            
-            var dataService = new JsonProjectDataService();
-            var viewModel = new ProjectManagerViewModel();
-            
-            // ãƒ‡ãƒ¼ã‚¿ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’è¨­å®š
-            DataContext = viewModel;
-            
-            // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³çµ‚äº†æ™‚ã®ãƒ‡ãƒ¼ã‚¿ä¿å­˜
-            Closing += async (sender, e) =>
-            {
-                await dataService.SaveProjectsAsync(viewModel.Projects);
-            };
-            
-            // ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³é–‹å§‹æ™‚ã®ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿
-            Loaded += async (sender, e) =>
-            {
-                var projects = await dataService.LoadProjectsAsync();
-                foreach (var project in projects)
-                {
-                    viewModel.Projects.Add(project);
-                }
-            };
-        }
-    }
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	public partial class MainWindow : Window
+	{
+		public MainWindow()
+		{
+			InitializeComponent();
+			
+			var dataService = new JsonProjectDataService();
+			var viewModel = new ProjectManagerViewModel();
+			
+			// ƒf[ƒ^ƒRƒ“ƒeƒLƒXƒg‚ðÝ’è
+			DataContext = viewModel;
+			
+			// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“I—¹Žž‚Ìƒf[ƒ^•Û‘¶
+			Closing += async (sender, e) =>
+			{
+				await dataService.SaveProjectsAsync(viewModel.Projects);
+			};
+			
+			// ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ŠJŽnŽž‚Ìƒf[ƒ^“Ç‚Ýž‚Ý
+			Loaded += async (sender, e) =>
+			{
+				var projects = await dataService.LoadProjectsAsync();
+				viewModel.LoadProjects(projects);
+			};
+		}
+	}
 }

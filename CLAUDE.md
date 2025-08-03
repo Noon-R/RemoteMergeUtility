@@ -2,97 +2,97 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**重要**: 日本語での返答を行ってください。
+**重要E*: 日本語での返答を行ってください、E
 
-## プロジェクト概要
+## プロジェクト概要E
 
-RemoteMergeUtilityは、MVVMアーキテクチャパターンを使用した.NET 8.0ベースのWPFアプリケーションです。厳格なMVVMコーディング規約に従うWindows専用のデスクトップユーティリティアプリケーションです。
+RemoteMergeUtilityは、MVVMアーキチE��チャパターンを使用した.NET 8.0ベ�EスのWPFアプリケーションです。厳格なMVVMコーチE��ング規紁E��従うWindows専用のチE��クトップユーチE��リチE��アプリケーションです、E
 
-このツールでは、カスタムURLスキーマで渡される引数からshellコマンドの実行を行います。
-渡されるパラメータは、対象projectのKeyとRevisionの指定, その他のとしての引数
-アプリ内でKeyと対象のProjectPathのセットを保持します。
-このデータは揮発しないようにファイルに保存します。
+こ�EチE�Eルでは、カスタムURLスキーマで渡される引数からshellコマンド�E実行を行います、E
+渡されるパラメータは、対象projectのKeyとRevisionの持E��E そ�E他�Eとしての引数
+アプリ冁E��Keyと対象のProjectPathのセチE��を保持します、E
+こ�EチE�Eタは揮発しなぁE��ぁE��ファイルに保存します、E
 
-## ビルドと開発コマンド
+## ビルドと開発コマンチE
 
-### ビルドと実行
+### ビルドと実衁E
 ```bash
-# ソリューションをビルド
+# ソリューションをビルチE
 dotnet build RemoteMergeUtility/RemoteMergeUtility.sln
 
-# デバッグモードでアプリケーションを実行
+# チE��チE��モードでアプリケーションを実衁E
 dotnet run --project RemoteMergeUtility/RemoteMergeUtility/RemoteMergeUtility.csproj
 
-# リリース版をビルド
+# リリース版をビルチE
 dotnet build RemoteMergeUtility/RemoteMergeUtility.sln -c Release
 ```
 
 ### プロジェクト構造
 ```
 RemoteMergeUtility/
-├── RemoteMergeUtility.sln          # ソリューションファイル
+├── RemoteMergeUtility.sln		  # ソリューションファイル
 └── RemoteMergeUtility/
-    ├── RemoteMergeUtility.csproj   # メインプロジェクトファイル
-    ├── App.xaml                    # アプリケーションエントリーポイント
-    ├── MainWindow.xaml/.cs         # メインウィンドウ
-    └── [今後実装予定のMVVM構造]
+	├── RemoteMergeUtility.csproj   # メインプロジェクトファイル
+	├── App.xaml					# アプリケーションエントリーポインチE
+	├── MainWindow.xaml/.cs		 # メインウィンドウ
+	└── [今後実裁E��定�EMVVM構造]
 ```
 
-## アーキテクチャとMVVM規約
+## アーキチE��チャとMVVM規紁E
 
-このプロジェクトは`wpf_mvvm_coding_standards.md`で定義された厳格なWPF MVVM コーディング規約に従います。主要なアーキテクチャ原則：
+こ�Eプロジェクト�E`wpf_mvvm_coding_standards.md`で定義された厳格なWPF MVVM コーチE��ング規紁E��従います。主要なアーキチE��チャ原則�E�E
 
-### フォルダ構造（実装予定）
-- `Models/` - データモデルとビジネスロジック
-- `ViewModels/` - INotifyPropertyChangedを実装するビューモデル
+### フォルダ構造�E�実裁E��定！E
+- `Models/` - チE�EタモチE��とビジネスロジチE��
+- `ViewModels/` - INotifyPropertyChangedを実裁E��るビューモチE��
 - `Views/` - 最小限のコードビハインドを持つXAMLビュー
-- `Services/` - 外部サービスとデータアクセス
-- `Converters/` - データバインディング用の値コンバーター
-- `Commands/` - カスタムコマンド実装
-- `Helpers/` - ヘルパークラスとユーティリティ
-- `Resources/` - UIリソース（画像、スタイルなど）
+- `Services/` - 外部サービスとチE�Eタアクセス
+- `Converters/` - チE�EタバインチE��ング用の値コンバ�Eター
+- `Commands/` - カスタムコマンド実裁E
+- `Helpers/` - ヘルパ�EクラスとユーチE��リチE��
+- `Resources/` - UIリソース�E�画像、スタイルなど�E�E
 
 ### 主要なMVVM要件
-- **View** はビジネスロジックを含んではならない - データバインディングと最小限のUIロジックのみ
-- **ViewModel** はViewを直接参照してはならない - データバインディングとコマンドを使用
-- **Model** はUI更新のためにINotifyPropertyChangedを実装
-- クラス、プロパティ、メソッドにはPascalCaseを使用
-- プライベートフィールドには`_`プレフィックス付きUpperCamelCaseを使用
-- **readonly フィールドと定数**には`_UPPER_SNAKE_CASE`を使用（privateの場合は`_`プレフィックス付き）
-- すべてのUI操作はイベントハンドラーではなくCommandバインディングを使用
+- **View** はビジネスロジチE��を含んではならなぁE- チE�EタバインチE��ングと最小限のUIロジチE��のみ
+- **ViewModel** はViewを直接参�EしてはならなぁE- チE�EタバインチE��ングとコマンドを使用
+- **Model** はUI更新のためにINotifyPropertyChangedを実裁E
+- クラス、�Eロパティ、メソチE��にはPascalCaseを使用
+- プライベ�Eトフィールドには`_`プレフィチE��ス付きUpperCamelCaseを使用
+- **readonly フィールドと定数**には`_UPPER_SNAKE_CASE`を使用�E�Erivateの場合�E`_`プレフィチE��ス付き�E�E
+- すべてのUI操作�EイベントハンドラーではなくCommandバインチE��ングを使用
 
-### インストール済みライブラリ
-- **LivetCask (4.0.2)** - Messaging、Behavior、MVVM支援（日本製）
-- **CommunityToolkit.Mvvm (8.4.0)** - モダンなMVVMフレームワーク（Microsoft公式）
-- **Microsoft.Extensions.DependencyInjection (9.0.7)** - 依存性注入コンテナ
-- **Serilog.Extensions.Hosting (9.0.0)** - 構造化ログ出力
-- **MaterialDesignThemes (5.2.1)** - Material Design UIコンポーネント
-- **System.Text.Json** - JSON シリアライゼーション（.NET標準）
+### インスト�Eル済みライブラリ
+- **LivetCask (4.0.2)** - Messaging、Behavior、MVVM支援�E�日本製�E�E
+- **CommunityToolkit.Mvvm (8.4.0)** - モダンなMVVMフレームワーク�E�Eicrosoft公式！E
+- **Microsoft.Extensions.DependencyInjection (9.0.7)** - 依存性注入コンチE��
+- **Serilog.Extensions.Hosting (9.0.0)** - 構造化ログ出劁E
+- **MaterialDesignThemes (5.2.1)** - Material Design UIコンポ�EネンチE
+- **System.Text.Json** - JSON シリアライゼーション�E�ENET標準！E
 
 ### 追加検討ライブラリ
-- **FluentValidation** - 流暢なAPIによるモデルバリデーション
-- **Serilog.Sinks.File** - ファイル出力用Sink（必要に応じて）
+- **FluentValidation** - 流暢なAPIによるモチE��バリチE�Eション
+- **Serilog.Sinks.File** - ファイル出力用Sink�E�忁E��に応じて�E�E
 
-### データバインディングパターン
+### チE�EタバインチE��ングパターン
 ```xml
-<!-- 適切な双方向バインディング -->
+<!-- 適刁E��双方向バインチE��ング -->
 <TextBox Text="{Binding PropertyName, UpdateSourceTrigger=PropertyChanged}" />
 
-<!-- コマンドバインディング -->
+<!-- コマンドバインチE��ング -->
 <Button Command="{Binding SaveCommand}" />
 
-<!-- コンバーター使用 -->
+<!-- コンバ�Eター使用 -->
 <TextBlock Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
 ```
 
 ## 開発ガイドライン
 
-1. **MVVM準拠**: 新機能はすべて厳格なMVVM分離に従う必要があります
-2. **非同期操作**: ブロッキングの可能性がある操作にはasync/awaitを使用
-3. **エラーハンドリング**: ユーザーフレンドリーなエラーメッセージでtry-catchブロックを実装
-4. **バリデーション**: モデルバリデーションにはIDataErrorInfoを使用
-5. **依存性注入**: テスタビリティのためにサービスをインターフェースで抽象化
+1. **MVVM準拠**: 新機�Eはすべて厳格なMVVM刁E��に従う忁E��がありまぁE
+2. **非同期操佁E*: ブロチE��ングの可能性がある操作にはasync/awaitを使用
+3. **エラーハンドリング**: ユーザーフレンドリーなエラーメチE��ージでtry-catchブロチE��を実裁E
+4. **バリチE�Eション**: モチE��バリチE�EションにはIDataErrorInfoを使用
+5. **依存性注入**: チE��タビリチE��のためにサービスをインターフェースで抽象匁E
 
-## プロジェクトステータス
+## プロジェクトスチE�Eタス
 
-現在は最小限のWPFプロジェクトテンプレートです。確立されたコーディング規約に従ってMVVM構造とビジネスロジックの実装が必要です。
+現在は最小限のWPFプロジェクトテンプレートです。確立されたコーチE��ング規紁E��従ってMVVM構造とビジネスロジチE��の実裁E��忁E��です�
