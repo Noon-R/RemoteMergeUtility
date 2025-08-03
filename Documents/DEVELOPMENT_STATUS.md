@@ -45,6 +45,8 @@
 - Complete separation of concerns (View, ViewModel, Model)
 - No code-behind business logic
 - UPPER_SNAKE_CASE naming for readonly fields and constants
+- Explicit private field declarations (no backing fields)
+- Command properties implemented with dedicated private readonly fields
 
 #### 5. **URL Scheme Handler System**
 - Custom URL scheme registration (`mergeutil://`)
@@ -64,7 +66,7 @@
 - Build configuration-based service selection
 - Project name resolution from path mappings
 
-#### 7. **Development Environment**
+#### 7. **Application Infrastructure**
 - Git repository initialization with comprehensive .gitignore
 - Initial commit with proper project structure
 - Coding standards documentation (Japanese)
@@ -72,6 +74,10 @@
 - Code formatting standardization (tabs instead of spaces)
 - Comprehensive URL scheme registration documentation
 - Automated testing scripts for URL scheme validation
+- Single instance application control with mutex
+- System tray integration for background operation
+- Structured logging system with LogService wrapper
+- Named pipe server for inter-process communication
 
 ## Technology Stack
 
@@ -118,11 +124,17 @@
 RemoteMergeUtility/
 ├── Documents/					# Project documentation
 │   ├── DEVELOPMENT_STATUS.md			# This file - project progress summary
+│   ├── INSTALLER_GUIDE.md			# Windows installer creation guide
 │   └── URL_SCHEME_REGISTRATION.md		# URL scheme setup documentation
 ├── Scripts/					# Automation scripts
 │   ├── RegisterUrlScheme.bat			# URL scheme registration
 │   ├── UnregisterUrlScheme.bat		# URL scheme removal
 │   └── TestUrlScheme.bat			# URL scheme testing
+├── Installer/					# Windows installer configuration
+│   ├── RemoteMergeUtility.Installer.wixproj	# WiX project file
+│   ├── Product.wxs				# WiX installer definition
+│   └── License.rtf				# License agreement for installer
+├── BuildInstaller.bat				# Automated installer build script
 ├── RemoteMergeUtility/				# Main solution folder
 │   ├── RemoteMergeUtility.sln			# Visual Studio solution
 │   └── RemoteMergeUtility/			# Main project
@@ -132,7 +144,7 @@ RemoteMergeUtility/
 │       ├── ViewModels/				# MVVM view models
 │       │   ├── ViewModelBase.cs		# Base class for ViewModels
 │       │   ├── RelayCommand.cs			# Command implementation
-│       │   └── ProjectManagerViewModel.cs	# Main VM
+│       │   └── ProjectManagerViewModel.cs	# Main VM with explicit fields
 │       ├── Views/				# XAML user interfaces
 │       │   └── ProjectManagerView.xaml	# Main project management UI
 │       ├── Services/				# External services and data access
@@ -142,8 +154,9 @@ RemoteMergeUtility/
 │       │   ├── UrlSchemeService.cs		# URL parsing implementation
 │       │   ├── ILaunchToolService.cs		# External tool interface
 │       │   ├── LaunchToolService.cs		# Real external tool service
-│       │   └── MockLaunchToolService.cs	# Debug mock service
-│       ├── App.xaml				# Application entry point
+│       │   ├── MockLaunchToolService.cs	# Debug mock service
+│       │   └── LogService.cs			# Structured logging wrapper
+│       ├── App.xaml				# Application entry point with tray support
 │       ├── MainWindow.xaml			# Main application window
 │       └── RemoteMergeUtility.csproj		# Project configuration
 ├── .gitignore					# Git ignore rules for .NET
@@ -156,12 +169,20 @@ RemoteMergeUtility/
 
 ### **URL Scheme Processing Flow**
 1. **URL Reception**: `mergeutil://?target=ProjectKey&revision=123&args=optional`
-2. **Parameter Parsing**: `UrlSchemeService` extracts and validates parameters
-3. **Project Resolution**: App.xaml.cs loads ProjectInfo and resolves target path
-4. **External Tool Query**: `ILaunchToolService` checks project status via virtual tool
-5. **Conditional Execution**:
+2. **Single Instance Check**: Mutex ensures only one application instance
+3. **Parameter Parsing**: `UrlSchemeService` extracts and validates parameters
+4. **Project Resolution**: App.xaml.cs loads ProjectInfo and resolves target path
+5. **External Tool Query**: `ILaunchToolService` checks project status via virtual tool
+6. **Conditional Execution**:
    - **If not running**: Launch project via external tool command
    - **If running**: Send HTTP POST request with revision/args data
+7. **System Tray Operation**: Application runs in background after processing
+
+### **Application Lifecycle**
+- **Startup**: Single instance enforcement with named mutex
+- **Background Operation**: System tray icon with context menu
+- **Inter-Process Communication**: Named pipe server for URL scheme handling
+- **Graceful Shutdown**: Proper resource cleanup and data persistence
 
 ### **Build Configuration Behavior**
 - **Debug Build**: Uses `MockLaunchToolService` with simulated responses
@@ -171,17 +192,24 @@ RemoteMergeUtility/
 
 ### **Next Priority Features**
 
-#### 1. **Enhanced Error Handling**
-- Comprehensive error logging with Serilog
-- User-friendly error dialogs with retry mechanisms
-- Application crash recovery
+#### 1. **Windows Installer Package**
+- WiX Toolset v3-based MSI installer
+- Automatic URL scheme registration during installation
+- Start menu shortcuts and desktop integration
+- Uninstall cleanup with registry key removal
 
-#### 2. **Configuration Management**
-- Application settings persistence
+#### 2. **Enhanced Error Handling**
+- Comprehensive error logging with Serilog integration
+- User-friendly error dialogs with retry mechanisms
+- Application crash recovery and diagnostics
+
+#### 3. **Configuration Management**
+- Application settings persistence beyond project data
 - External tool endpoint configuration
 - UI theme and appearance options
+- Logging level and output configuration
 
-#### 3. **Advanced UI Features**
+#### 4. **Advanced UI Features**
 - Project validation (path existence checking)
 - Import/Export functionality for project configurations
 - Search and filtering capabilities
@@ -237,6 +265,9 @@ dotnet run --project RemoteMergeUtility/RemoteMergeUtility/RemoteMergeUtility.cs
 # Build for release (uses LaunchToolService)
 dotnet build RemoteMergeUtility/RemoteMergeUtility.sln -c Release
 
+# Build Windows installer (requires WiX Toolset v3.11+)
+BuildInstaller.bat
+
 # Test URL scheme (after registration)
 Scripts/TestUrlScheme.bat
 ```
@@ -257,6 +288,6 @@ Scripts/UnregisterUrlScheme.bat
 ---
 
 **Last Updated**: August 2025  
-**Development Stage**: URL Scheme & External Tool Integration Complete  
-**Next Milestone**: Enhanced Error Handling & Configuration Management  
-**Status**: Core functionality implemented, ready for production testing
+**Development Stage**: Core Application Infrastructure Complete  
+**Next Milestone**: Windows Installer Package & Enhanced Error Handling  
+**Status**: Production-ready core functionality with system tray integration and logging
